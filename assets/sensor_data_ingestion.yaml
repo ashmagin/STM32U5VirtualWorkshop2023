@@ -1,0 +1,644 @@
+Parameters:
+  ParticipantRoleName:
+    Description: optional - use only during AWS Event in Workshop Studio
+    Type: String
+    Default: "" # WSParticipantRole
+
+  ParticipantRoleArn:
+    Description: optional - use only during AWS Event in Workshop Studio
+    Type: String
+    Default: "" # arn:aws:iam::000000000000:role/WSParticipantRole
+
+Conditions:
+  IsWorkshopStudio: !Not [!Equals [!Ref ParticipantRoleName, ""]]
+
+Resources:
+  GrafanaVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc
+  GrafanaVpcPublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: GrafanaVPC
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      CidrBlock: 10.0.0.0/18
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc/PublicSubnet1
+  GrafanaVpcPublicSubnet1RouteTableC6C73A81:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: GrafanaVPC
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc/PublicSubnet1
+  GrafanaVpcPublicSubnet1RouteTableAssociation6E822B38:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: GrafanaVpcPublicSubnet1RouteTableC6C73A81
+      SubnetId:
+        Ref: GrafanaVpcPublicSubnet1
+  GrafanaVpcPublicSubnet1DefaultRoute7F22FC72:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: GrafanaVpcPublicSubnet1RouteTableC6C73A81
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: GrafanaVpcIGW
+    DependsOn:
+      - GrafanaVpcVPCGWA33CFADD
+  GrafanaVpcPublicSubnet1EIPD009C2D5:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc/PublicSubnet1
+  GrafanaVpcPublicSubnet1NATGatewayA7094EEE:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId:
+        Ref: GrafanaVpcPublicSubnet1
+      AllocationId: !GetAtt GrafanaVpcPublicSubnet1EIPD009C2D5.AllocationId
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc/PublicSubnet1
+  GrafanaVpcPublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: GrafanaVPC
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ""
+      CidrBlock: 10.0.64.0/18
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc/PublicSubnet2
+  GrafanaVpcPublicSubnet2RouteTable1F8FE552:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: GrafanaVPC
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc/PublicSubnet2
+  GrafanaVpcPublicSubnet2RouteTableAssociationD7F94424:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: GrafanaVpcPublicSubnet2RouteTable1F8FE552
+      SubnetId:
+        Ref: GrafanaVpcPublicSubnet2
+  GrafanaVpcPublicSubnet2DefaultRoute408F5E7C:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: GrafanaVpcPublicSubnet2RouteTable1F8FE552
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: GrafanaVpcIGW
+    DependsOn:
+      - GrafanaVpcVPCGWA33CFADD
+  GrafanaVpcPublicSubnet2EIPFFAD672C:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc/PublicSubnet2
+  GrafanaVpcPublicSubnet2NATGateway606D7A03:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId:
+        Ref: GrafanaVpcPublicSubnet2
+      AllocationId: !GetAtt GrafanaVpcPublicSubnet2EIPFFAD672C.AllocationId
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc/PublicSubnet2
+  GrafanaVpcPrivateSubnet1Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: GrafanaVPC
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      CidrBlock: 10.0.128.0/18
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc/PrivateSubnet1
+  GrafanaVpcPrivateSubnet1RouteTableB1193FC6:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: GrafanaVPC
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc/PrivateSubnet1
+  GrafanaVpcPrivateSubnet1RouteTableAssociation0D5BA153:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: GrafanaVpcPrivateSubnet1RouteTableB1193FC6
+      SubnetId:
+        Ref: GrafanaVpcPrivateSubnet1Subnet
+  GrafanaVpcPrivateSubnet1DefaultRouteC53EA475:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: GrafanaVpcPrivateSubnet1RouteTableB1193FC6
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: GrafanaVpcPublicSubnet1NATGatewayA7094EEE
+  GrafanaVpcPrivateSubnet2Subnet34D60EAF:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: GrafanaVPC
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ""
+      CidrBlock: 10.0.192.0/18
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc/PrivateSubnet2
+  GrafanaVpcPrivateSubnet2RouteTable65907CCF:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: GrafanaVPC
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc/PrivateSubnet2
+  GrafanaVpcPrivateSubnet2RouteTableAssociationDB45C720:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: GrafanaVpcPrivateSubnet2RouteTable65907CCF
+      SubnetId:
+        Ref: GrafanaVpcPrivateSubnet2Subnet34D60EAF
+  GrafanaVpcPrivateSubnet2DefaultRouteEF1ACA2D:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: GrafanaVpcPrivateSubnet2RouteTable65907CCF
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: GrafanaVpcPublicSubnet2NATGateway606D7A03
+  GrafanaVpcIGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: GrafanaPatternStack/GrafanaVpc
+  GrafanaVpcVPCGWA33CFADD:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: GrafanaVPC
+      InternetGatewayId:
+        Ref: GrafanaVpcIGW
+  GrafanaECSCluster:
+    Type: AWS::ECS::Cluster
+  GrafanaTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+                - ecs.amazonaws.com
+  GrafanaTaskExecutionRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: GrafanaTaskExecutionRolePolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - timestream:CancelQuery
+              - timestream:DescribeDatabase
+              - timestream:DescribeEndpoints
+              - timestream:DescribeScheduledQuery
+              - timestream:DescribeTable
+              - timestream:ListDatabases
+              - timestream:ListMeasures
+              - timestream:ListScheduledQueries
+              - timestream:ListTables
+              - timestream:ListTagsForResource
+              - timestream:Select
+              - timestream:SelectValues
+            Effect: Allow
+            Resource: "*"
+      Roles:
+        - Ref: GrafanaTaskExecutionRole
+  GrafanaELB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      LoadBalancerAttributes:
+        - Key: deletion_protection.enabled
+          Value: "false"
+      Scheme: internet-facing
+      SecurityGroups:
+        - !GetAtt GrafanaServiceLBSecurityGroup.GroupId
+      Subnets:
+        - Ref: GrafanaVpcPublicSubnet1
+        - Ref: GrafanaVpcPublicSubnet2
+      Type: application
+    DependsOn:
+      - GrafanaVpcPublicSubnet1DefaultRoute7F22FC72
+      - GrafanaVpcPublicSubnet2DefaultRoute408F5E7C
+  GrafanaServiceLBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Automatically created Security Group for ELB GrafanaPatternStackGrafanaServiceLBBB560289
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow from anyone on port 80
+          FromPort: 80
+          IpProtocol: tcp
+          ToPort: 80
+      VpcId:
+        Ref: GrafanaVPC
+  GrafanaServiceLBSecurityGrouptoGrafanaPatternStackGrafanaServiceSecurityGroupF8F672463000D5D06FF1:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !GetAtt GrafanaServiceLBSecurityGroup.GroupId
+      IpProtocol: tcp
+      Description: Load balancer to target
+      DestinationSecurityGroupId: !GetAtt GrafanaServiceSecurityGroup.GroupId
+      FromPort: 3000
+      ToPort: 3000
+  GrafanaELBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn:
+            Ref: GrafanaELBTargetGroup
+          Type: forward
+      LoadBalancerArn:
+        Ref: GrafanaELB
+      Port: 80
+      Protocol: HTTP
+  GrafanaELBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckPath: /api/health
+      Port: 80
+      Protocol: HTTP
+      TargetGroupAttributes:
+        - Key: stickiness.enabled
+          Value: "false"
+      TargetType: ip
+      VpcId:
+        Ref: GrafanaVPC
+  GrafanaServiceTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn:
+      - TimestreamTable
+    Properties:
+      ContainerDefinitions:
+        - Name: grafana
+          Cpu: 512
+          Essential: true
+          Image: public.ecr.aws/bitnami/grafana:9.2.4-debian-11-r1
+          EntryPoint:
+            - '/bin/bash'
+          Command:
+            - '-c'
+            - 'eval "$PROVISION"'
+          Environment:
+            - Name: GF_SECURITY_ADMIN_USER
+              Value: workshop
+            - Name: GF_SECURITY_ADMIN_PASSWORD
+              Value: expresslink
+            - Name: GF_INSTALL_PLUGINS
+              Value: grafana-timestream-datasource
+            - Name: AWS_REGION
+              Value: !Sub "${AWS::Region}"
+            - Name: PROVISION
+              Value: |
+                #!/usr/bin/env bash
+
+                (
+                    unset $PROVISON
+                    unset $DASHBOARD
+                    /opt/bitnami/scripts/grafana/entrypoint.sh /opt/bitnami/scripts/grafana/run.sh
+                ) &
+
+                set -u
+
+
+                GRAFANA_URL=${GRAFANA_URL:-http://localhost:3000}
+
+                mkdir /tmp/binaries
+                export PATH=/tmp/binaries:$PATH
+
+                curl --retry 15 --retry-all-errors -L -s \
+                  -o /tmp/binaries/http \
+                  https://github.com/httpie/httpie/releases/download/3.2.1/http
+                chmod +x /tmp/binaries/http
+
+                curl --retry 15 --retry-all-errors -L -s \
+                  -o /tmp/binaries/jq \
+                  https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+                chmod +x /tmp/binaries/jq
+
+                sleep 5
+
+                for i in {1..100}; do
+                    if http -vv --check-status --ignore-stdin --timeout=5 \
+                        -a ${GF_SECURITY_ADMIN_USER}:${GF_SECURITY_ADMIN_PASSWORD} --print b --output /tmp/key.json \
+                        POST ${GRAFANA_URL}/api/auth/keys \
+                        name=provisioning-$(date +%s) role=Admin secondsToLive:=300 ;
+                    then
+                        printf "\nGrafana Provisioning: successfully created API key.\n"
+                        break
+                    fi
+
+                    printf "\nGrafana Provisioning: API key not yet created...\n"
+                    sleep 5
+                done
+
+                key=$(cat /tmp/key.json | jq -r '.key')
+
+                for i in {1..10}; do
+                    if http -vv --check-status --ignore-stdin --timeout=5 \
+                        POST ${GRAFANA_URL}/api/datasources \
+                        Authorization:"Bearer ${key}" \
+                        name="Amazon Timestream" isDefault:=true type="grafana-timestream-datasource" access=proxy \
+                        jsonData:='{"defaultRegion": "'"${AWS_REGION}"'","defaultDatabase":"\"SensorData\"", "defaultTable": "\"stm32u5\""}'
+                    then
+                        printf "\nGrafana Provisioning: successfully created Timestream data source.\n"
+                        break
+                    fi
+                    printf "\nGrafana Provisioning: Timestream data source not yet created...\n"
+                    sleep 5
+                done
+
+                for i in {1..10}; do
+                    if http -vv --check-status --ignore-stdin --timeout=5 --print b --output /tmp/imported_dashboard.json \
+                        POST $GRAFANA_URL/api/dashboards/db \
+                        Authorization:"Bearer ${key}" \
+                        dashboard:="${DASHBOARD}"
+                    then
+                        printf "\nGrafana Provisioning: successfully import dashboard.\n"
+                        break
+                    fi
+                    printf "\nGrafana Provisioning: dashboard not yet imported...\n"
+                    sleep 5
+                done
+
+                import_dashboard=$(cat /tmp/imported_dashboard.json | jq -r '.uid')
+
+                for i in {1..10}; do
+                    if http -vv --check-status --ignore-stdin --timeout=5 \
+                        PUT $GRAFANA_URL/api/org/preferences \
+                        Authorization:"Bearer ${key}" \
+                        homeDashboardUID="${import_dashboard}"
+                    then
+                        printf "\nGrafana Provisioning: successfully set home dashboard.\n"
+                        break
+                    fi
+                    printf "\nGrafana Provisioning: home dashboard not yet set...\n"
+                    sleep 5
+                done
+
+                rm -rf /tmp/binaries/
+                printf "\nGrafana Provisioning: complete.\n"
+
+                wait
+
+            - Name: DASHBOARD
+              Value: |
+                {"title":"stm32u5 - Sensor Data","id":null,"uid":null,"version":1,"editable":true,"refresh":"5s","time":{"from":"now-5m","to":"now"},"annotations":{"list":[{"builtIn":1,"datasource":{"type":"grafana","uid":"-- Grafana --"},"enable":true,"hide":true,"iconColor":"rgba(0, 211, 255, 1)","name":"Annotations & Alerts","target":{"limit":100,"matchAny":false,"tags":[],"type":"dashboard"},"type":"dashboard"}]},"fiscalYearStartMonth":0,"graphTooltip":0,"links":[],"liveNow":false,"panels":[{"datasource":{"type":"grafana-timestream-datasource"},"description":"","fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"max":3000,"min":100,"thresholds":{"mode":"absolute","steps":[{"color":"red","value":null},{"color":"#EAB839","value":500},{"color":"super-light-yellow","value":1000}]}},"overrides":[]},"gridPos":{"h":6,"w":5,"x":0,"y":0},"id":12,"options":{"orientation":"auto","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showThresholdLabels":false,"showThresholdMarkers":true},"pluginVersion":"9.1.6","targets":[{"datasource":{"type":"grafana-timestream-datasource"},"region":"default","database":"\"SensorData\"","table":"\"stm32u5\"","measure":"pressure","dimensions":{},"expression":"","id":"","label":"","matchExact":true,"metricEditorMode":0,"metricName":"","metricQueryType":0,"namespace":"","period":"","queryMode":"Metrics","rawQuery":"SELECT time, measure_value::bigint FROM $__database.$__table WHERE $__timeFilter and measure_name = '$__measure' ","refId":"A","sqlExpression":"","statistic":"Average"}],"title":"Barometric Pressure","type":"gauge"},{"datasource":{"type":"grafana-timestream-datasource"},"description":"","fieldConfig":{"defaults":{"color":{"fixedColor":"yellow","mode":"fixed"},"custom":{"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"drawStyle":"line","fillOpacity":15,"gradientMode":"none","hideFrom":{"legend":false,"tooltip":false,"viz":false},"lineInterpolation":"linear","lineWidth":1,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"auto","spanNulls":false,"stacking":{"group":"A","mode":"none"},"thresholdsStyle":{"mode":"off"}},"displayName":"Pressure","mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null},{"color":"red","value":80}]},"unit":"none"},"overrides":[]},"gridPos":{"h":6,"w":14,"x":5,"y":0},"id":6,"options":{"legend":{"calcs":[],"displayMode":"list","placement":"bottom","showLegend":true},"tooltip":{"mode":"single","sort":"none"}},"targets":[{"datasource":{"type":"grafana-timestream-datasource"},"region":"default","database":"\"SensorData\"","table":"\"stm32u5\"","measure":"pressure","dimensions":{},"expression":"","id":"","label":"","matchExact":true,"metricEditorMode":0,"metricName":"","metricQueryType":0,"namespace":"","period":"","queryMode":"Metrics","rawQuery":"SELECT time, measure_value::bigint FROM $__database.$__table WHERE $__timeFilter and measure_name = '$__measure' ","refId":"A","sqlExpression":"","statistic":"Average"}],"title":"Barometric Pressure","type":"timeseries"},{"datasource":{"type":"grafana-timestream-datasource"},"description":"","fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"max":100,"min":0,"thresholds":{"mode":"absolute","steps":[{"color":"semi-dark-yellow","value":null},{"color":"green","value":40},{"color":"yellow","value":70}]},"unit":"humidity"},"overrides":[]},"gridPos":{"h":6,"w":5,"x":0,"y":6},"id":8,"options":{"orientation":"auto","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showThresholdLabels":false,"showThresholdMarkers":true},"pluginVersion":"9.1.6","targets":[{"datasource":{"type":"grafana-timestream-datasource"},"region":"default","database":"\"SensorData\"","table":"\"stm32u5\"","measure":"humidity","dimensions":{},"expression":"","id":"","label":"","matchExact":true,"metricEditorMode":0,"metricName":"","metricQueryType":0,"namespace":"","period":"","queryMode":"Metrics","rawQuery":"SELECT time, measure_value::double FROM $__database.$__table WHERE $__timeFilter and measure_name = '$__measure' ","refId":"A","sqlExpression":"","statistic":"Average"}],"title":"Humidity","type":"gauge"},{"datasource":{"type":"grafana-timestream-datasource"},"fieldConfig":{"defaults":{"color":{"fixedColor":"blue","mode":"fixed"},"custom":{"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","axisSoftMin":30,"axisSoftMax":70,"barAlignment":0,"drawStyle":"line","fillOpacity":15,"gradientMode":"none","hideFrom":{"legend":false,"tooltip":false,"viz":false},"lineInterpolation":"linear","lineWidth":1,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"auto","spanNulls":false,"stacking":{"group":"A","mode":"none"},"thresholdsStyle":{"mode":"off"}},"displayName":"Humidity","mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null},{"color":"red","value":44}]},"unit":"humidity"},"overrides":[]},"gridPos":{"h":6,"w":14,"x":5,"y":6},"id":4,"options":{"legend":{"calcs":[],"displayMode":"list","placement":"bottom","showLegend":true},"tooltip":{"mode":"single","sort":"none"}},"targets":[{"database":"\"SensorData\"","datasource":{"type":"grafana-timestream-datasource"},"dimensions":{},"expression":"","id":"","label":"","matchExact":true,"measure":"humidity","metricEditorMode":0,"metricName":"","metricQueryType":0,"namespace":"","period":"","queryMode":"Metrics","rawQuery":"SELECT time, measure_value::double FROM $__database.$__table WHERE $__timeFilter and measure_name = '$__measure' ","refId":"A","region":"default","sqlExpression":"","statistic":"Average","table":"\"stm32u5\""}],"title":"Humidity","type":"timeseries"},{"datasource":{"type":"grafana-timestream-datasource"},"fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"max":60,"min":0,"thresholds":{"mode":"absolute","steps":[{"color":"blue","value":null},{"color":"green","value":20},{"color":"yellow","value":30},{"color":"red","value":40}]},"unit":"celsius"},"overrides":[]},"gridPos":{"h":6,"w":5,"x":0,"y":12},"id":10,"options":{"orientation":"auto","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showThresholdLabels":false,"showThresholdMarkers":true},"pluginVersion":"9.1.6","targets":[{"database":"\"SensorData\"","datasource":{"type":"grafana-timestream-datasource"},"dimensions":{},"expression":"","id":"","label":"","matchExact":true,"measure":"temperature","metricEditorMode":0,"metricName":"","metricQueryType":0,"namespace":"","period":"","queryMode":"Metrics","rawQuery":"SELECT time, measure_value::double FROM $__database.$__table WHERE $__timeFilter and measure_name = '$__measure' ","refId":"A","region":"default","sqlExpression":"","statistic":"Average","table":"\"stm32u5\""}],"title":"Temperature","type":"gauge"},{"datasource":{"type":"grafana-timestream-datasource"},"fieldConfig":{"defaults":{"color":{"fixedColor":"red","mode":"fixed"},"custom":{"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","axisSoftMin":18,"axisSoftMax":28,"barAlignment":0,"drawStyle":"line","fillOpacity":15,"gradientMode":"none","hideFrom":{"legend":false,"tooltip":false,"viz":false},"lineInterpolation":"linear","lineWidth":1,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"auto","spanNulls":false,"stacking":{"group":"A","mode":"none"},"thresholdsStyle":{"mode":"off"}},"displayName":"Temperature","mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"celsius"},"overrides":[{"__systemRef":"hideSeriesFrom","matcher":{"id":"byNames","options":{"mode":"exclude","names":["measure_value::double"],"prefix":"All except:","readOnly":true}},"properties":[{"id":"custom.hideFrom","value":{"legend":false,"tooltip":false,"viz":true}}]}]},"gridPos":{"h":6,"w":14,"x":5,"y":12},"id":2,"options":{"legend":{"calcs":[],"displayMode":"list","placement":"bottom","showLegend":true},"tooltip":{"mode":"single","sort":"none"}},"pluginVersion":"9.1.6","targets":[{"database":"\"SensorData\"","datasource":{"type":"grafana-timestream-datasource"},"dimensions":{},"expression":"","hide":false,"id":"","label":"","matchExact":true,"measure":"temperature","metricEditorMode":0,"metricName":"","metricQueryType":0,"namespace":"","period":"","queryMode":"Metrics","rawQuery":"SELECT time, measure_value::double FROM $__database.$__table WHERE $__timeFilter and measure_name = '$__measure' ","refId":"A","region":"default","sqlExpression":"","statistic":"Average","table":"\"stm32u5\"","waitForResult":true}],"title":"Temperature","type":"timeseries"}],"schemaVersion":37,"style":"dark","tags":[],"templating":{"list":[]},"timepicker":{},"timezone":"","weekStart":""}
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group:
+                Ref: GrafanaServiceTaskDefwebLogGroup8436DDE4
+              awslogs-stream-prefix: GrafanaService
+              awslogs-region:
+                Ref: AWS::Region
+          Memory: 2048
+          PortMappings:
+            - ContainerPort: 3000
+              Protocol: tcp
+      Cpu: "512"
+      ExecutionRoleArn: !GetAtt GrafanaServiceTaskDefExecutionRole.Arn
+      TaskRoleArn: !GetAtt GrafanaTaskExecutionRole.Arn
+      Family: GrafanaPatternStackGrafanaServiceTaskDef5B5EBB38
+      Memory: "2048"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+  GrafanaServiceTaskDefwebLogGroup8436DDE4:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  GrafanaServiceTaskDefExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+  GrafanaServiceTaskDefExecutionRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource: !GetAtt GrafanaServiceTaskDefwebLogGroup8436DDE4.Arn
+      PolicyName: GrafanaServiceTaskDefExecutionRolePolicy
+      Roles:
+        - Ref: GrafanaServiceTaskDefExecutionRole
+  GrafanaECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Ref: GrafanaECSCluster
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      DesiredCount: 1
+      EnableECSManagedTags: false
+      HealthCheckGracePeriodSeconds: 60
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: grafana
+          ContainerPort: 3000
+          TargetGroupArn:
+            Ref: GrafanaELBTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !GetAtt GrafanaServiceSecurityGroup.GroupId
+          Subnets:
+            - Ref: GrafanaVpcPrivateSubnet1Subnet
+            - Ref: GrafanaVpcPrivateSubnet2Subnet34D60EAF
+      TaskDefinition:
+        Ref: GrafanaServiceTaskDefinition
+    DependsOn:
+      - GrafanaELBListener
+  GrafanaServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: GrafanaPatternStack/GrafanaService/Service/SecurityGroup
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      VpcId:
+        Ref: GrafanaVPC
+  GrafanaServiceSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      Description: Load balancer to target
+      FromPort: 3000
+      ToPort: 3000
+      GroupId: !GetAtt GrafanaServiceSecurityGroup.GroupId
+      SourceSecurityGroupId: !GetAtt GrafanaServiceLBSecurityGroup.GroupId
+
+
+
+
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - PATCH
+            - POST
+            - DELETE
+          Compress: yes
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # CachingOptimized, see https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html
+          OriginRequestPolicyId: 216adef6-5c7f-47e4-b989-5492eafa07d3 # AllViewer, see https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html
+          TargetOriginId: alb
+          ViewerProtocolPolicy: redirect-to-https
+        Origins:
+          - Id: alb
+            DomainName: !GetAtt GrafanaELB.DNSName
+            CustomOriginConfig:
+              OriginProtocolPolicy: http-only
+        PriceClass: PriceClass_All
+
+
+
+
+  TimestreamDatabase:
+    Type: AWS::Timestream::Database
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties:
+      DatabaseName: SensorData
+  TimestreamTable:
+    Type: AWS::Timestream::Table
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    DependsOn:
+      - TimestreamDatabase
+    Properties:
+      DatabaseName: SensorData
+      RetentionProperties:
+        MemoryStoreRetentionPeriodInHours: "24"
+        MagneticStoreRetentionPeriodInDays: "7"
+      TableName: stm32u5
+  TimestreamInsertRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - iot.amazonaws.com
+            Action:
+              - sts:AssumeRole
+  TimestreamInsertPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: TimestreamInsertPolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - timestream:WriteRecords
+            Resource: !Sub "arn:${AWS::Partition}:timestream:${AWS::Region}:${AWS::AccountId}:database/SensorData/table/*"
+          - Effect: Allow
+            Action:
+              - timestream:DescribeEndpoints
+            Resource: "*"
+      Roles:
+        - !Ref TimestreamInsertRole
+
+
+
+
+  AdditionalPassRoleWSParticipant:
+    Type: AWS::IAM::Policy
+    Condition: IsWorkshopStudio
+    Properties:
+      PolicyName: AdditionalPassRoleWSParticipant-TimeStreamInsertRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - iam:PassRole
+            Resource: !GetAtt TimestreamInsertRole.Arn
+      Roles:
+        - !Ref ParticipantRoleName
+
+
+
+
+Outputs:
+  GrafanaURL:
+    Value: !GetAtt CloudFrontDistribution.DomainName

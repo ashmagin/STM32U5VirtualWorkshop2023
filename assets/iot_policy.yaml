@@ -1,0 +1,24 @@
+Resources:
+  IoTPolicy:
+    Type: AWS::IoT::Policy
+    Properties:
+      PolicyName: DemoBadgeDevelopmentPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+            - iot:Connect
+          Resource:
+            - "*"
+        - Effect: Allow
+          Action:
+            - iot:Publish
+            - iot:Receive
+          Resource:
+            - !Sub "arn:${AWS::Partition}:iot:${AWS::Region}:${AWS::AccountId}:topic/*"
+        - Effect: Allow
+          Action:
+            - iot:Subscribe
+          Resource:
+            - !Sub "arn:${AWS::Partition}:iot:${AWS::Region}:${AWS::AccountId}:topicfilter/*"
