@@ -17,7 +17,7 @@ A number of components were pre-provisioned in the accounts already using [AWS C
 - [Amazon Cloudfront](https://aws.amazon.com/cloudfront/) CDN distribution with TLS certificate to protect Grafana internet facing dashboard.
 - Number of [AWS Identity and Access Management](https://aws.amazon.com/iam/) policies and roles, governing how the services can interact with each other.
 
-If you want to recreate workshop in your **own** AWS account, please download [sensor_data_ingestion.yaml](https://github.com/ashmagin/STM32U5VirtualWorkshop2023/sensor_data_ingestion.yaml) and [iot_policy.yaml](https://github.com/ashmagin/STM32U5VirtualWorkshop2023/iot_policy.yaml) CloudFormation templetes to create those stacks.
+If you want to recreate workshop in your **own** AWS account, please download [sensor_data_ingestion.yaml](https://github.com/ashmagin/STM32U5VirtualWorkshop2023/assets/sensor_data_ingestion.yaml) and [iot_policy.yaml](https://github.com/ashmagin/STM32U5VirtualWorkshop2023/assetsiot_policy.yaml) CloudFormation templetes to create those stacks.
 
 ### Log in to Workshop Studio AWS account
 
