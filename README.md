@@ -5,13 +5,13 @@
 
 In this tutorial we will:
 
-- create a rule in AWS IoT Core to send the data from MQTT topic to Amazon Timestream
-- observe the data in the Amazon Timestream database (which is AWS specialized serverless database for time-series data)
+- create a rule in AWS IoT Core to send sensors' data from MQTT topic to Amazon Timestream
+- observe the data in Amazon Timestream database (which is AWS specialized serverless database for time-series data)
 - log in to Grafana workspace and configure the dashboard
 - visualize the data from STM32U5 IoT Sensor Node environmental sensors (temperature, humidity, and barometric pressure) in Grafana
 
 Every participant will have individual AWS account to experiment with. Accounts are provisioned using Workshop Studio and will be terminated after the workshop.
-A number of components are pre-provisioned in the accounts already using [AWS CloudFormation](https://aws.amazon.com/cloudformation/), namely:
+A number of components were pre-provisioned in the accounts already using [AWS CloudFormation](https://aws.amazon.com/cloudformation/), namely:
 - [Amazon Timestream](https://aws.amazon.com/timestream/) database and table
 - [AWS Fargate](https://aws.amazon.com/fargate/) running Docker container with Grafana application
 - [Amazon Cloudfront](https://aws.amazon.com/cloudfront/) CDN distribution with TLS certificate to protect Grafana internet facing dashboard.
