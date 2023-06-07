@@ -21,7 +21,7 @@ If you want to recreate workshop in your **own** AWS account, please download [s
 
 ### Log in to Workshop Studio AWS account
 
-Let's log in to the workshop account using One Time Password (OTP) method from the [workshop landing page](https://catalog.us-east-1.prod.workshops.aws/join?access-code=0760-05334e-84)
+Let's log in to the workshop account using One Time Password (OTP) method from the [workshop landing page](https://catalog.us-east-1.prod.workshops.aws/join?access-code=2ceb-093a6a-10)
 
 1. Select **Email One-time Password**
 <img src="images/otpInit.png" width="50%" height="50%">
